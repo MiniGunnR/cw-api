@@ -1,5 +1,4 @@
 *.pyc
 *.pyo
-*.csv
 venv/
 db.sqlite3
