@@ -1,13 +1,25 @@
-import os
+import os, json
+from django.core.exceptions import ImproperlyConfigured
+from pathlib import Path
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+BASE_DIR = Path(__file__).parent.parent.parent
 
-SECRET_KEY = 'c!19pxp!5#kz381dqkx7gbqt2wf^bdn$_p1(984*b7z(iizc1q'
+# JSON-based secrets module
+with open(os.path.join(BASE_DIR, 'secrets.json')) as f:
+    secrets = json.loads(f.read())
 
+def get_secret(setting, secrets=secrets):
+    '''Get the secret variable or return explicit exception.'''
+    try:
+        return secrets[setting]
+    except KeyError:
+        error_msg = 'Set the {0} environment variable'.format(setting)
+        raise ImproperlyConfigured(error_msg)
 
-DEBUG = False
+SECRET_KEY = get_secret('SECRET_KEY')
 
-ALLOWED_HOSTS = ['*']
+DEBUG = True
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -18,7 +30,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',
-    'corsheaders',
 
     'utils',
     'api',
@@ -35,15 +46,13 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-CORS_ORIGIN_ALLOW_ALL = True
-
 ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            os.path.join(BASE_DIR, 'build'),
+            BASE_DIR / 'build',
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -94,11 +103,11 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'build', 'static'),
+    BASE_DIR / 'build' / 'static',
 ]
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = BASE_DIR / 'static'
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = BASE_DIR / 'media'
 
 MEDIA_URL = '/media/'

@@ -2,3 +2,4 @@
 *.pyo
 venv/
 db.sqlite3
+secrets.json
